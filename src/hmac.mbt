@@ -259,6 +259,13 @@ test "verify accepts matching tag and rejects changed tag" {
   inspect(verify(b"key", b"message!", tag), content="false")
 }
 
+test "verify rejects truncated and extended tags" {
+  let tag = hmac_sha256(b"key", b"message")
+  let truncated = Bytes::from_array(tag[:31].to_array())
+  inspect(verify(b"key", b"message", truncated), content="false")
+  inspect(verify(b"key", b"message", tag + b"\x00"), content="false")
+}
+
 test "hmac_sha256 matches RFC 4231 long key test case" {
   inspect(
     hmac_sha256(Bytes::make(131, b'\xaa'), b"Test Using Larger Than Block-Size Key - Hash Key First") ==
