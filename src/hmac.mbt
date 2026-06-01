@@ -4,6 +4,14 @@ pub let sha256_digest_size : Int = 32
 /// SHA-256 block size in bytes, used by HMAC key padding.
 pub let sha256_block_size : Int = 64
 
+fn sha256_digest_hex(input : Bytes) -> String {
+  let digest = @sha256.Digest::new()
+  for byte in input {
+    digest.write(byte)
+  }
+  digest.check_sum()
+}
+
 /// Return a byte-wise XOR of two equal-length byte strings.
 pub fn xor_bytes(left : Bytes, right : Bytes) -> Bytes {
   guard left.length() == right.length() else {
@@ -60,6 +68,13 @@ test "xor_bytes combines equal-length inputs" {
     content=(
       #|b"\xff\xff"
     ),
+  )
+}
+
+test "sha256 dependency produces known digest" {
+  inspect(
+    sha256_digest_hex(b"abc"),
+    content="ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
   )
 }
 

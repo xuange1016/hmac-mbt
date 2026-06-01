@@ -1,9 +1,17 @@
 {
   "name": "xuange1016/hmac",
   "version": "0.1.0",
+  "deps": {
+    "gmlewis/sha256": "0.17.31"
+  },
   "readme": "README.md",
   "repository": "git@github.com:xuange1016/hmac-mbt.git",
   "license": "Apache-2.0",
-  "keywords": ["hmac", "hash", "sha256", "authentication"],
+  "keywords": [
+    "hmac",
+    "hash",
+    "sha256",
+    "authentication"
+  ],
   "description": "HMAC-SHA256 implementation for MoonBit"
 }
