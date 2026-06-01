@@ -11,18 +11,18 @@
 
 ## 开发期
 
-- [ ] 实现字节异或和 key 规范化辅助函数。
-- [ ] 实现 HMAC-SHA256 核心算法。
-- [ ] 实现恒定时间比较。
-- [ ] 增加 RFC 或公开来源测试向量。
-- [ ] 增加边界测试：空 key、空 message、长 key、tag 长度不一致。
-- [ ] 每次提交前运行 `moon check`。
-- [ ] 每次提交前运行 `moon test`。
+- [x] 实现字节异或和 key 规范化辅助函数。
+- [x] 实现 HMAC-SHA256 核心算法。
+- [x] 实现恒定时间比较。
+- [x] 增加 RFC 或公开来源测试向量。
+- [x] 增加边界测试：空 key、空 message、长 key、tag 长度不一致。
+- [x] 每次提交前运行 `moon check`。
+- [x] 每次提交前运行 `moon test`。
 
 ## 验收前
 
-- [ ] README 示例可复现。
-- [ ] `moon check` 通过。
-- [ ] `moon test` 通过。
-- [ ] CI 覆盖 check 和 test。
+- [x] README 示例可复现。
+- [x] `moon check` 通过。
+- [x] `moon test` 通过。
+- [x] CI 覆盖 check 和 test。
 - [ ] `competition/ACCEPTANCE_SUMMARY.md` 更新到最新能力。
