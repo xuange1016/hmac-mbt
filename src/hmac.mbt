@@ -190,6 +190,39 @@ test "hmac_sha256 computes known digest" {
   )
 }
 
+test "hmac_sha256 matches RFC 4231 test case 1" {
+  inspect(
+    hmac_sha256(Bytes::make(20, b'\x0b'), b"Hi There") ==
+    bytes_from_hex(
+      "b0344c61d8db38535ca8afceaf0bf12b" +
+      "881dc200c9833da726e9376c2e32cff7",
+    ),
+    content="true",
+  )
+}
+
+test "hmac_sha256 matches RFC 4231 test case 2" {
+  inspect(
+    hmac_sha256(b"Jefe", b"what do ya want for nothing?") ==
+    bytes_from_hex(
+      "5bdcc146bf60754e6a042426089575c7" +
+      "5a003f089d2739839dec58b964ec3843",
+    ),
+    content="true",
+  )
+}
+
+test "hmac_sha256 matches RFC 4231 test case 3" {
+  inspect(
+    hmac_sha256(Bytes::make(20, b'\xaa'), Bytes::make(50, b'\xdd')) ==
+    bytes_from_hex(
+      "773ea91e36800e46854db8ebd09181a7" +
+      "2959098b3ef8c122d9635514ced565fe",
+    ),
+    content="true",
+  )
+}
+
 test "constant_time_equal compares tag bytes and lengths" {
   inspect(constant_time_equal(b"abc", b"abc"), content="true")
   inspect(constant_time_equal(b"abc", b"abd"), content="false")
