@@ -93,8 +93,9 @@ pub fn constant_time_equal(left : Bytes, right : Bytes) -> Bool {
 }
 
 /// Compute an HMAC-SHA256 tag.
-pub fn hmac_sha256(_key : Bytes, _message : Bytes) -> Bytes {
-  abort("hmac_sha256 is not implemented yet")
+pub fn hmac_sha256(key : Bytes, message : Bytes) -> Bytes {
+  let inner_hash = sha256_digest(inner_pad_for_sha256(key) + message)
+  sha256_digest(outer_pad_for_sha256(key) + inner_hash)
 }
 
 /// Verify an HMAC-SHA256 tag.
@@ -177,6 +178,16 @@ test "outer_pad_for_sha256 xors normalized key with opad byte" {
   inspect(pad[0], content="b'\\x53'")
   inspect(pad[1], content="b'\\x5C'")
   inspect(pad[63], content="b'\\x5C'")
+}
+
+test "hmac_sha256 computes known digest" {
+  inspect(
+    hmac_sha256(b"key", b"The quick brown fox jumps over the lazy dog") ==
+    bytes_from_hex(
+      "f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8",
+    ),
+    content="true",
+  )
 }
 
 test "constant_time_equal compares tag bytes and lengths" {
