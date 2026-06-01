@@ -1,23 +1,61 @@
-# hmac-mbt — HMAC 消息认证码
+# hmac-mbt
 
-## 项目目标
+HMAC-SHA256 message authentication code library for MoonBit.
 
-将 Python 标准库 `hmac` 的核心功能移植到 MoonBit，实现基于哈希函数的消息认证码（HMAC-SHA256）。
+`hmac-mbt` provides a small, testable implementation of the HMAC construction
+defined by RFC 2104, using SHA-256 as the underlying hash function.
 
-## 功能要求
+## Features
 
-- 实现 HMAC-SHA256 算法（RFC 2104）
-- 支持任意长度的密钥和消息
-- 支持密钥超过 64 字节时先对密钥做哈希
-- 提供 `hmac_sha256(key, message)` → `Bytes`
-- 提供 `verify(key, message, tag)` → `Bool`（恒定时间比较）
-- 依赖 MoonBit 标准库的 SHA256 实现
+- Compute HMAC-SHA256 tags as `Bytes`.
+- Compute lowercase hexadecimal HMAC-SHA256 tags.
+- Verify tags with a constant-time comparison helper.
+- Handle short keys, block-sized keys, and keys longer than the SHA-256 block size.
+- Include RFC 4231 test vectors and boundary tests.
 
-## 参考
+## API
 
-- Python: `import hmac; hmac.new(key, msg, 'sha256').digest()`
-- 已有生态：mooncakes 上有独立 SHA256（gmlewis/sha256），但无 HMAC
+```moonbit
+pub fn hmac_sha256(key : Bytes, message : Bytes) -> Bytes
+pub fn hmac_sha256_hex(key : Bytes, message : Bytes) -> String
+pub fn verify(key : Bytes, message : Bytes, tag : Bytes) -> Bool
+pub fn constant_time_equal(left : Bytes, right : Bytes) -> Bool
+pub fn to_hex(input : Bytes) -> String
+```
 
-## 难度
+## Example
 
-⭐⭐⭐ — 需要理解 HMAC 算法和位运算
+```moonbit
+test {
+  let tag = hmac_sha256_hex(
+    b"key",
+    b"The quick brown fox jumps over the lazy dog",
+  )
+  inspect(
+    tag,
+    content="f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8",
+  )
+}
+```
+
+## Verify Locally
+
+```powershell
+moon check
+moon test
+```
+
+## Project Scope
+
+This project currently focuses on HMAC-SHA256. It does not yet provide a
+generic multi-hash HMAC interface or streaming incremental input API.
+
+## Reference
+
+- RFC 2104: HMAC: Keyed-Hashing for Message Authentication
+- RFC 4231: Identifiers and Test Vectors for HMAC-SHA-224, HMAC-SHA-256,
+  HMAC-SHA-384, and HMAC-SHA-512
+
+## License
+
+Apache-2.0
