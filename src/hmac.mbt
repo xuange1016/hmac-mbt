@@ -78,16 +78,24 @@ pub fn outer_pad_for_sha256(key : Bytes) -> Bytes {
 
 /// Compare two tags without early exit.
 ///
-/// Length mismatches still scan the shared prefix before returning `false`.
+/// Different-length inputs scan the longer input and fold missing bytes as zero.
 pub fn constant_time_equal(left : Bytes, right : Bytes) -> Bool {
-  let shared = if left.length() < right.length() {
+  let max_len = if left.length() > right.length() {
     left.length()
   } else {
     right.length()
   }
   let mut diff = left.length() ^ right.length()
-  for i in 0..<shared {
-    diff = diff | (left[i].to_int() ^ right[i].to_int())
+  for i in 0..<max_len {
+    let left_byte = match left.get(i) {
+      Some(byte) => byte.to_int()
+      None => 0
+    }
+    let right_byte = match right.get(i) {
+      Some(byte) => byte.to_int()
+      None => 0
+    }
+    diff = diff | (left_byte ^ right_byte)
   }
   diff == 0
 }
@@ -280,4 +288,10 @@ test "constant_time_equal compares tag bytes and lengths" {
   inspect(constant_time_equal(b"abc", b"abc"), content="true")
   inspect(constant_time_equal(b"abc", b"abd"), content="false")
   inspect(constant_time_equal(b"abc", b"abcd"), content="false")
+}
+
+test "constant_time_equal scans longer input on length mismatch" {
+  inspect(constant_time_equal(b"", b"\x00"), content="false")
+  inspect(constant_time_equal(b"\x00", b""), content="false")
+  inspect(constant_time_equal(b"abc", b"abc\x00"), content="false")
 }
