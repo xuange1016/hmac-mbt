@@ -62,6 +62,20 @@ pub fn normalize_key_for_sha256(key : Bytes) -> Bytes {
   zero_pad_to(base_key, sha256_block_size)
 }
 
+fn hmac_pad(key : Bytes, pad_byte : Byte) -> Bytes {
+  xor_bytes(normalize_key_for_sha256(key), Bytes::make(sha256_block_size, pad_byte))
+}
+
+/// Return the SHA-256 HMAC inner pad for a key.
+pub fn inner_pad_for_sha256(key : Bytes) -> Bytes {
+  hmac_pad(key, b'\x36')
+}
+
+/// Return the SHA-256 HMAC outer pad for a key.
+pub fn outer_pad_for_sha256(key : Bytes) -> Bytes {
+  hmac_pad(key, b'\x5c')
+}
+
 /// Compare two tags without early exit.
 ///
 /// Length mismatches still scan the shared prefix before returning `false`.
@@ -147,6 +161,22 @@ test "normalize_key_for_sha256 hashes long keys before padding" {
   inspect(normalized[:32] == digest, content="true")
   inspect(normalized[32], content="b'\\x00'")
   inspect(normalized[63], content="b'\\x00'")
+}
+
+test "inner_pad_for_sha256 xors normalized key with ipad byte" {
+  let pad = inner_pad_for_sha256(b"\x0f")
+  inspect(pad.length(), content="64")
+  inspect(pad[0], content="b'\\x39'")
+  inspect(pad[1], content="b'\\x36'")
+  inspect(pad[63], content="b'\\x36'")
+}
+
+test "outer_pad_for_sha256 xors normalized key with opad byte" {
+  let pad = outer_pad_for_sha256(b"\x0f")
+  inspect(pad.length(), content="64")
+  inspect(pad[0], content="b'\\x53'")
+  inspect(pad[1], content="b'\\x5C'")
+  inspect(pad[63], content="b'\\x5C'")
 }
 
 test "constant_time_equal compares tag bytes and lengths" {
