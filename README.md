@@ -59,3 +59,6 @@ generic multi-hash HMAC interface or streaming incremental input API.
 ## License
 
 Apache-2.0
+
+The HMAC construction in this repository is implemented by `hmac-mbt`. SHA-256
+digest computation is provided by the MoonBit package `gmlewis/sha256`.

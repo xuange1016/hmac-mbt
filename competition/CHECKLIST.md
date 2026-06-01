@@ -7,7 +7,7 @@
 - [ ] Gitlink 仓库与 GitHub 同步。
 - [ ] 仓库保留 10-20 个有效 commits。
 - [ ] README 说明项目目标、用法、限制和许可证。
-- [ ] 说明项目性质为原创 MoonBit 实现，参考标准为 RFC 2104。
+- [x] 说明项目性质为原创 MoonBit 实现，参考标准为 RFC 2104。
 
 ## 开发期
 
@@ -25,4 +25,4 @@
 - [x] `moon check` 通过。
 - [x] `moon test` 通过。
 - [x] CI 覆盖 check 和 test。
-- [ ] `competition/ACCEPTANCE_SUMMARY.md` 更新到最新能力。
+- [x] `competition/ACCEPTANCE_SUMMARY.md` 更新到最新能力。
