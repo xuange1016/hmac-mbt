@@ -251,6 +251,31 @@ test "verify accepts matching tag and rejects changed tag" {
   inspect(verify(b"key", b"message!", tag), content="false")
 }
 
+test "hmac_sha256 matches RFC 4231 long key test case" {
+  inspect(
+    hmac_sha256(Bytes::make(131, b'\xaa'), b"Test Using Larger Than Block-Size Key - Hash Key First") ==
+    bytes_from_hex(
+      "60e431591ee0b67f0d8a26aacbf5b77f" +
+      "8e0bc6213728c5140546040f0ee37f54",
+    ),
+    content="true",
+  )
+}
+
+test "hmac_sha256 handles long key with long data" {
+  inspect(
+    hmac_sha256(
+      Bytes::make(131, b'\xaa'),
+      b"This is a test using a larger than block-size key and a larger than block-size data. The key needs to be hashed before being used by the HMAC algorithm.",
+    ) ==
+    bytes_from_hex(
+      "9b09ffa71b942fcb27635fbcd5b0e944" +
+      "bfdc63644f0713938a7f51535c3a35e2",
+    ),
+    content="true",
+  )
+}
+
 test "constant_time_equal compares tag bytes and lengths" {
   inspect(constant_time_equal(b"abc", b"abc"), content="true")
   inspect(constant_time_equal(b"abc", b"abd"), content="false")
