@@ -12,6 +12,30 @@ fn sha256_digest_hex(input : Bytes) -> String {
   digest.check_sum()
 }
 
+fn hex_char(value : Int) -> Char {
+  if value < 10 {
+    Int::unsafe_to_char(value + b'0'.to_int())
+  } else {
+    Int::unsafe_to_char(value - 10 + b'a'.to_int())
+  }
+}
+
+/// Encode bytes as a lowercase hexadecimal string.
+pub fn to_hex(input : Bytes) -> String {
+  let output = Buffer(size_hint=input.length() * 2)
+  for byte in input {
+    let value = byte.to_int()
+    output.write_char_utf16le(hex_char((value >> 4) & 0x0f))
+    output.write_char_utf16le(hex_char(value & 0x0f))
+  }
+  output.contents().to_unchecked_string()
+}
+
+/// Compute an HMAC-SHA256 tag and return it as lowercase hexadecimal.
+pub fn hmac_sha256_hex(key : Bytes, message : Bytes) -> String {
+  to_hex(hmac_sha256(key, message))
+}
+
 fn hex_nibble(ch : UInt16) -> Int {
   let code = ch.to_int()
   if code >= b'0'.to_int() && code <= b'9'.to_int() {
@@ -133,6 +157,17 @@ test "bytes_from_hex decodes lowercase and uppercase input" {
     content=(
       #|b"\x0a\xff"
     ),
+  )
+}
+
+test "to_hex encodes bytes as lowercase hex" {
+  inspect(to_hex(b"\x00\x0f\x10\xff"), content="000f10ff")
+}
+
+test "hmac_sha256_hex returns lowercase hex digest" {
+  inspect(
+    hmac_sha256_hex(b"key", b"The quick brown fox jumps over the lazy dog"),
+    content="f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8",
   )
 }
 
