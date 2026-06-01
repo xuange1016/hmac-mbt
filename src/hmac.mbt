@@ -223,6 +223,34 @@ test "hmac_sha256 matches RFC 4231 test case 3" {
   )
 }
 
+test "hmac_sha256 handles empty key and message" {
+  inspect(
+    hmac_sha256(b"", b"") ==
+    bytes_from_hex(
+      "b613679a0814d9ec772f95d778c35fc5" +
+      "ff1697c493715653c6c712144292c5ad",
+    ),
+    content="true",
+  )
+}
+
+test "hmac_sha256 handles empty message" {
+  inspect(
+    hmac_sha256(b"key", b"") ==
+    bytes_from_hex(
+      "5d5d139563c95b5967b9bd9a8c9b233a" +
+      "9dedb45072794cd232dc1b74832607d0",
+    ),
+    content="true",
+  )
+}
+
+test "verify accepts matching tag and rejects changed tag" {
+  let tag = hmac_sha256(b"key", b"message")
+  inspect(verify(b"key", b"message", tag), content="true")
+  inspect(verify(b"key", b"message!", tag), content="false")
+}
+
 test "constant_time_equal compares tag bytes and lengths" {
   inspect(constant_time_equal(b"abc", b"abc"), content="true")
   inspect(constant_time_equal(b"abc", b"abd"), content="false")
