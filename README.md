@@ -55,6 +55,7 @@ generic multi-hash HMAC interface or streaming incremental input API.
 - RFC 2104: HMAC: Keyed-Hashing for Message Authentication
 - RFC 4231: Identifiers and Test Vectors for HMAC-SHA-224, HMAC-SHA-256,
   HMAC-SHA-384, and HMAC-SHA-512
+- Python standard library: `hmac.new(key, message, hashlib.sha256)`
 
 ## License
 
