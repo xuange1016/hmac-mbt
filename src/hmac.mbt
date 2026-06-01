@@ -53,3 +53,44 @@ pub fn hmac_sha256(_key : Bytes, _message : Bytes) -> Bytes {
 pub fn verify(key : Bytes, message : Bytes, tag : Bytes) -> Bool {
   constant_time_equal(hmac_sha256(key, message), tag)
 }
+
+test "xor_bytes combines equal-length inputs" {
+  inspect(
+    xor_bytes(b"\x0f\xf0", b"\xf0\x0f"),
+    content=(
+      #|b"\xff\xff"
+    ),
+  )
+}
+
+test "zero_pad_to extends with zero bytes" {
+  inspect(
+    zero_pad_to(b"key", 5),
+    content=(
+      #|b"key\x00\x00"
+    ),
+  )
+}
+
+test "normalize_key_for_sha256 pads short keys to block size" {
+  let normalized = normalize_key_for_sha256(b"key")
+  inspect(normalized.length(), content="64")
+  inspect(normalized[0], content="b'\\x6B'")
+  inspect(normalized[1], content="b'\\x65'")
+  inspect(normalized[2], content="b'\\x79'")
+  inspect(normalized[3], content="b'\\x00'")
+}
+
+test "normalize_key_for_sha256 keeps block-sized keys" {
+  let key = Bytes::make(sha256_block_size, b'\x01')
+  let normalized = normalize_key_for_sha256(key)
+  inspect(normalized.length(), content="64")
+  inspect(normalized[0], content="b'\\x01'")
+  inspect(normalized[63], content="b'\\x01'")
+}
+
+test "constant_time_equal compares tag bytes and lengths" {
+  inspect(constant_time_equal(b"abc", b"abc"), content="true")
+  inspect(constant_time_equal(b"abc", b"abd"), content="false")
+  inspect(constant_time_equal(b"abc", b"abcd"), content="false")
+}
