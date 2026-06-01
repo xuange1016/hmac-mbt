@@ -1,0 +1,28 @@
+# hmac-mbt 检查清单
+
+## 申报前
+
+- [ ] 项目名称、简介和适用场景清晰。
+- [ ] GitHub 仓库公开可访问。
+- [ ] Gitlink 仓库与 GitHub 同步。
+- [ ] 仓库保留 10-20 个有效 commits。
+- [ ] README 说明项目目标、用法、限制和许可证。
+- [ ] 说明项目性质为原创 MoonBit 实现，参考标准为 RFC 2104。
+
+## 开发期
+
+- [ ] 实现字节异或和 key 规范化辅助函数。
+- [ ] 实现 HMAC-SHA256 核心算法。
+- [ ] 实现恒定时间比较。
+- [ ] 增加 RFC 或公开来源测试向量。
+- [ ] 增加边界测试：空 key、空 message、长 key、tag 长度不一致。
+- [ ] 每次提交前运行 `moon check`。
+- [ ] 每次提交前运行 `moon test`。
+
+## 验收前
+
+- [ ] README 示例可复现。
+- [ ] `moon check` 通过。
+- [ ] `moon test` 通过。
+- [ ] CI 覆盖 check 和 test。
+- [ ] `competition/ACCEPTANCE_SUMMARY.md` 更新到最新能力。
