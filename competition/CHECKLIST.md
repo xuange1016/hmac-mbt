@@ -27,3 +27,4 @@
 - [x] CI 覆盖 check 和 test。
 - [x] `competition/ACCEPTANCE_SUMMARY.md` 更新到最新能力。
 - [x] 增加 Python 对照和互操作说明。
+- [x] 完成申报前最终自查记录。
