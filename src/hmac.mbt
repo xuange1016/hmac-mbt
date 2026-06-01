@@ -12,6 +12,32 @@ fn sha256_digest_hex(input : Bytes) -> String {
   digest.check_sum()
 }
 
+fn hex_nibble(ch : UInt16) -> Int {
+  let code = ch.to_int()
+  if code >= b'0'.to_int() && code <= b'9'.to_int() {
+    code - b'0'.to_int()
+  } else if code >= b'a'.to_int() && code <= b'f'.to_int() {
+    code - b'a'.to_int() + 10
+  } else if code >= b'A'.to_int() && code <= b'F'.to_int() {
+    code - b'A'.to_int() + 10
+  } else {
+    abort("invalid hex character")
+  }
+}
+
+fn bytes_from_hex(hex : String) -> Bytes {
+  guard hex.length() % 2 == 0 else { abort("hex string must have even length") }
+  Bytes::makei(hex.length() / 2, i => {
+    let hi = hex_nibble(hex.unsafe_get(i * 2))
+    let lo = hex_nibble(hex.unsafe_get(i * 2 + 1))
+    ((hi << 4) | lo).to_byte()
+  })
+}
+
+fn sha256_digest(input : Bytes) -> Bytes {
+  bytes_from_hex(sha256_digest_hex(input))
+}
+
 /// Return a byte-wise XOR of two equal-length byte strings.
 pub fn xor_bytes(left : Bytes, right : Bytes) -> Bytes {
   guard left.length() == right.length() else {
@@ -27,13 +53,13 @@ pub fn zero_pad_to(input : Bytes, size : Int) -> Bytes {
 }
 
 /// Normalize an HMAC key to exactly one SHA-256 block.
-///
-/// Long-key hashing will be added with the SHA-256 dependency.
 pub fn normalize_key_for_sha256(key : Bytes) -> Bytes {
-  guard key.length() <= sha256_block_size else {
-    abort("long key normalization requires SHA-256")
+  let base_key = if key.length() > sha256_block_size {
+    sha256_digest(key)
+  } else {
+    key
   }
-  zero_pad_to(key, sha256_block_size)
+  zero_pad_to(base_key, sha256_block_size)
 }
 
 /// Compare two tags without early exit.
@@ -78,6 +104,15 @@ test "sha256 dependency produces known digest" {
   )
 }
 
+test "bytes_from_hex decodes lowercase and uppercase input" {
+  inspect(
+    bytes_from_hex("0aFF"),
+    content=(
+      #|b"\x0a\xff"
+    ),
+  )
+}
+
 test "zero_pad_to extends with zero bytes" {
   inspect(
     zero_pad_to(b"key", 5),
@@ -102,6 +137,16 @@ test "normalize_key_for_sha256 keeps block-sized keys" {
   inspect(normalized.length(), content="64")
   inspect(normalized[0], content="b'\\x01'")
   inspect(normalized[63], content="b'\\x01'")
+}
+
+test "normalize_key_for_sha256 hashes long keys before padding" {
+  let key = Bytes::make(65, b'a')
+  let normalized = normalize_key_for_sha256(key)
+  let digest = sha256_digest(key)
+  inspect(normalized.length(), content="64")
+  inspect(normalized[:32] == digest, content="true")
+  inspect(normalized[32], content="b'\\x00'")
+  inspect(normalized[63], content="b'\\x00'")
 }
 
 test "constant_time_equal compares tag bytes and lengths" {
